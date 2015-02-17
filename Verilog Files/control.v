@@ -150,7 +150,8 @@ module control(
     parameter state_cpta7 =  8'h70;
     parameter state_cpta8 =  8'h71;
     // CALL
-    parameter state_ret = 8'h90;
+    parameter state_ret1 = 8'h90;
+    parameter state_ret2 = 8'h91;
 
     parameter E100_HALT =    32'h0000;
     parameter E100_ADD =     32'h0001;
@@ -1060,11 +1061,10 @@ module control(
             end
             
             state_ret2: begin
-                // reassign PC; transfer mem[arg1] to address
+                // transfer mem[arg1] to PC
                 memory_drive = 1'b1;
                 pc_write = 1'b1;
-                address_write = 1'b1;
-                next_state = state_decode;
+                next_state = state_fetch1;
             end
                 
         endcase
