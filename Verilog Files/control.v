@@ -115,8 +115,6 @@ module control(
     parameter state_sr4 =    8'h4d;
     parameter state_sr5 =    8'h4e;
     parameter state_sr6 =    8'h4f;
-    // CPFA
-    // CPTA
     parameter state_be1 =    8'h50;
     parameter state_be2 =    8'h51;
     parameter state_be3 =    8'h52;
@@ -135,6 +133,22 @@ module control(
     parameter state_blt4 =   8'h5f;
     parameter state_blt5 =   8'h60;
     parameter state_blt6 =   8'h61;
+    parameter state_cpfa1 =  8'h62;
+    parameter state_cpfa2 =  8'h63;
+    parameter state_cpfa3 =  8'h64;
+    parameter state_cpfa4 =  8'h65;
+    parameter state_cpfa5 =  8'h66;
+    parameter state_cpfa6 =  8'h67;
+    parameter state_cpfa7 =  8'h68;
+    parameter state_cpfa8 =  8'h69;
+    parameter state_cpta1 =  8'h6a;
+    parameter state_cpta2 =  8'h6b;
+    parameter state_cpta3 =  8'h6c;
+    parameter state_cpta4 =  8'h6d;
+    parameter state_cpta5 =  8'h6e;
+    parameter state_cpta6 =  8'h6f;
+    parameter state_cpta7 =  8'h70;
+    parameter state_cpta8 =  8'h71;
     // CALL
     // RET
 
@@ -290,6 +304,10 @@ module control(
                     next_state = state_bne1;
                 end else if (opcode_out == E100_BLT) begin
                     next_state = state_blt1;
+                end else if (opcode_out == E100_CPFA) begin
+                    next_state = state_cpfa1;
+                end else if (opcode_out == E100_CPTA) begin
+                    next_state = state_cpta1;
 
                 *************************************************
                 * Replace these lines with decode logic for the *
@@ -910,6 +928,123 @@ module control(
                 pc_write = 1'b1;
                 next_state = state_fetch1;
             end 
+
+            // execute cpta instruction
+
+            state_cpfa1: begin
+                // transfer arg3 to mar
+                arg3_drive = 1'b1;
+                address_write = 1'b1;
+                next_state = state_cpfa2;
+            end
+
+            state_cpfa2: begin
+                // transfer mem[arg3] to op2
+                memory_drive = 1'b1;
+                op2_write = 1'b1;
+                next_state = state_cpfa3;
+            end
+
+            state_cpfa3: begin
+                // transfer arg2 to op1
+                arg2_drive = 1'b1;
+                op1_write = 1'b1;
+                next_state = state_cpfa4;
+            end
+
+            state_cpfa4: begin
+                // transfer op1 + op2 to op2
+                add_drive = 1'b1;
+                op2_write = 1'b1;
+                next_state = state_cpfa5;
+            end
+
+            state_cpfa5: begin
+                // transfer arg2 + mem[arg3] to mar
+                op2_drive = 1'b1;
+                address_write = 1'b1;
+                next_state = state_cpfa6;
+            end
+
+            state_cpfa6: begin
+                // transfer mem[arg2 + mem[arg3]] to op2
+                memory_drive = 1'b1;
+                op2_write = 1'b1;
+                next_state = state_cpfa7;
+            end
+
+            state_cpfa7: begin
+                // transfer arg1 to mar
+                arg1_drive = 1'b1;
+                address_write = 1'b1;
+                next_state = state_cpfa8;
+            end
+
+            state_cpfa8: begin
+                // transfer op2 to mem[arg1]
+                op2_drive = 1'b1;
+                memory_write = 1'b1;
+                next_state = state_fetch1;
+            end
+
+            // execute cpta instruction
+
+            state_cpta1: begin
+                // transfer arg3 to mar
+                arg3_drive = 1'b1;
+                address_write = 1'b1;
+                next_state = state_cpta2;
+            end
+
+            state_cpta2: begin
+                // transfer mem[arg3] to op2
+                memory_drive = 1'b1;
+                op2_write = 1'b1;
+                next_state = state_cpta3;
+            end
+
+            state_cpta3: begin
+                // transfer arg2 to op1
+                arg2_drive = 1'b1;
+                op1_write = 1'b1;
+                next_state = state_cpta4;
+            end
+
+            state_cpta4: begin
+                // transfer op1 + op2 to op1
+                add_drive = 1'b1;
+                op1_write = 1'b1;
+                next_state = state_cpta5;
+            end
+
+            state_cpta5: begin
+                // transfer arg1 to mar
+                arg1_drive = 1'b1;
+                address_write = 1'b1;
+                next_state = state_cpta6;
+            end
+
+            state_cpta6: begin
+                // transfer mem[arg1] to op2
+                memory_drive = 1'b1;
+                op2_write = 1'b1;
+                next_state = state_cpta7;
+            end
+
+            state_cpta7: begin
+                // transfer op1 to mar
+                op1_drive = 1'b1;
+                address_write = 1'b1;
+                next_state = state_cpta8;
+            end
+
+            state_cpta8: begin
+                // transfer op2 to mem[op1]
+                op2_drive = 1'b1;
+                memory_write = 1'b1;
+                next_state = state_fetch1;
+            end
+
 
         endcase
     end
