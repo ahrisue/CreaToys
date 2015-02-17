@@ -115,6 +115,8 @@ module control(
     parameter state_sr4 =    8'h4d;
     parameter state_sr5 =    8'h4e;
     parameter state_sr6 =    8'h4f;
+    // CPFA
+    // CPTA
     parameter state_be1 =    8'h50;
     parameter state_be2 =    8'h51;
     parameter state_be3 =    8'h52;
@@ -133,6 +135,8 @@ module control(
     parameter state_blt4 =   8'h5f;
     parameter state_blt5 =   8'h60;
     parameter state_blt6 =   8'h61;
+    // CALL
+    // RET
 
     parameter E100_HALT =    32'h0000;
     parameter E100_ADD =     32'h0001;
