@@ -150,7 +150,7 @@ module control(
     parameter state_cpta7 =  8'h70;
     parameter state_cpta8 =  8'h71;
     // CALL
-    // RET
+    parameter state_ret = 8'h90;
 
     parameter E100_HALT =    32'h0000;
     parameter E100_ADD =     32'h0001;
@@ -308,6 +308,9 @@ module control(
                     next_state = state_cpfa1;
                 end else if (opcode_out == E100_CPTA) begin
                     next_state = state_cpta1;
+                // CALL
+                end else if (opcode_out == E100_RET) begin
+                    next_state = state_ret1;
 
                 *************************************************
                 * Replace these lines with decode logic for the *
@@ -1045,7 +1048,25 @@ module control(
                 next_state = state_fetch1;
             end
 
-
+            // CALL
+            
+            // execute return instruction
+            
+            state_ret1: begin
+                // transfer arg1 to mar
+                arg1_drive = 1'b1;
+                address_write = 1'b1;
+                next_state = state_ret2;
+            end
+            
+            state_ret2: begin
+                // reassign PC; transfer mem[arg1] to address
+                memory_drive = 1'b1;
+                pc_write = 1'b1;
+                address_write = 1'b1;
+                next_state = state_decode;
+            end
+                
         endcase
     end
 
